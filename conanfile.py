@@ -1,16 +1,22 @@
-from conans import ConanFile, CMake, tools
+from conans import ConanFile, tools, __version__ as conan_version
+from conans.model.version import Version
 
 import tarfile
 import os, sys
 
-class GCCCrossCompilerConan(ConanFile):
-    name = "GCCCrossCompiler"
+class CrossGccConan(ConanFile):
+    name = "CrossGccConan"
     version = "5.4.0"
-    url = "<Package recipe repository url here, for issues about the package>"
-    description = "Create a GCC Cross-Compiler"
-    settings = "os", "compiler", "build_type", "arch"
-    generators = "cmake"
+    url = "https://github.com/BetterCallBene/conan-cgcc"
+    description = "Create a GCC cross-compiler"
+    author="Benedikt König"
+    license="gcc License"
 
+    settings = {"os_build" : ["Linux"],
+                "arch_build" : ["x86_64"],
+                "arch" : ["armv8"],
+                "compiler" : {"gcc" : { "version" : "5",
+                                        "libcxx" : ["libstdc++"]}}}
     binutils_version = "2.26.1"
     gcc_version = "5.4.0"
     glibc_version = "2.23"
@@ -20,8 +26,19 @@ class GCCCrossCompilerConan(ConanFile):
     gmp_version = "6.1.2"
     mpc_version = "1.1.0"
 
+    target_host = "aarch64-unknown-linux-gnu"
+    cc_compiler="gcc"
+    cxx_compiler="g++"
+    fortran_compiler="gfortran"
+
     exports_sources=["src/*"]
 
+    def configure(self):
+        if self.settings.os_build != "Linux":
+            raise Exception("Only Linux supported for cross compiler")
+    @property
+    def arch(self):
+        return self.settings.get_safe("arch_build") or self.settings.get_safe("arch")
     def source(self):
         print("wget binutils")
         tools.download("http://ftpmirror.gnu.org/binutils/binutils-%s.tar.gz" %
@@ -103,5 +120,16 @@ class GCCCrossCompilerConan(ConanFile):
         pass
 
     def package_info(self):
-        self.cpp_info.libs = ["GCCCrossCompiler"]
-
+        bin_folder=os.path.join(self.package_folder, "bin")
+        self.env_info.CONAN_CMAKE_GENERATOR ="Unix Makefiles"
+        self.env_info.CONAN_CMAKE_FIND_ROOT_PATH = os.path.join(self.package_folder, self.target_host, "sysroot")
+        self.env_info.path.append(bin_folder)
+        self.env_info.CHOST=self.target_host
+        self.env_info.AR="%s-ar" % (self.target_host)
+        self.env_info.AS="%s-as" % (self.target_host)
+        self.env_info.RANLIB="%s-ranlib" % (self.target_host)
+        self.env_info.CC="%s-%s" % (self.target_host, self.cc_compiler)
+        self.env_info.FC="%s-%s" % (self.target_host, self.fortran_compiler)
+        self.env_info.CXX="%s-%s" % (self.target_host, self.cxx_compiler)
+        self.env_info.LD ="%s-ld" % (self.target_host)
+        self.env_info.STRIP="%s-strip" % (self.target_host)
