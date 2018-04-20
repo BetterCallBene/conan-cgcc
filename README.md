@@ -32,7 +32,7 @@ Conan recipe to create a cross-compiler for arm64
     ```python
         def build_requirements(self):
             if self.settings.arch == "armv8":
-                self.build_requires("GCCCrossCompiler/5.4.0@php/stable")
+                self.build_requires("CrossGccConan/5.4.0@[user]/[channel]")
     ```
 5. Run
     ```bash
