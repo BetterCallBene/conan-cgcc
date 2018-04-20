@@ -23,7 +23,11 @@ Conan recipe to create a cross-compiler for arm64
     ```bash
         sudo apt-get install gawk
     ```
-* Recommended (and tested with Ubuntu 16.04)
+* liblzma-dev
+    ```bash
+        sudo apt-get install liblzma-dev
+    ```
+* Recommended (and tested with) Ubuntu 16.04
 ## Basic Build Instructions
 
 1. Clone this repo.
