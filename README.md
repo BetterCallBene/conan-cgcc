@@ -1,5 +1,5 @@
 # conan-cgcc
-Conan recipe to create a cross-compiler for arm64
+Conan recipe to create a gnu-cross-compiler for arm64
 
 ---
 
