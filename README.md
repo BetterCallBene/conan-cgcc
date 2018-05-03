@@ -27,6 +27,10 @@ Conan recipe to create a gnu-cross-compiler for arm64
     ```bash
         sudo apt-get install liblzma-dev
     ```
+* pylzma
+    ```bash
+         pip install pylzma
+    ```
 * Recommended (and tested with) Ubuntu 16.04
 ## Basic Build Instructions
 
